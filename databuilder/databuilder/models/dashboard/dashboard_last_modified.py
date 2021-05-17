@@ -12,14 +12,17 @@ from amundsen_rds.models.dashboard import DashboardTimestamp as RDSDashboardTime
 from databuilder.models.dashboard.dashboard_metadata import DashboardMetadata
 from databuilder.models.graph_node import GraphNode
 from databuilder.models.graph_relationship import GraphRelationship
+from databuilder.models.atlas_entity import AtlasEntity
+from databuilder.models.atlas_relationship import AtlasRelationship
 from databuilder.models.graph_serializable import GraphSerializable
 from databuilder.models.table_serializable import TableSerializable
+from databuilder.models.atlas_serializable import AtlasSerializable
 from databuilder.models.timestamp import timestamp_constants
 
 LOGGER = logging.getLogger(__name__)
 
 
-class DashboardLastModifiedTimestamp(GraphSerializable, TableSerializable):
+class DashboardLastModifiedTimestamp(GraphSerializable, TableSerializable, AtlasSerializable):
     """
     A model that encapsulate Dashboard's last modified timestamp in epoch
     """
@@ -84,6 +87,20 @@ class DashboardLastModifiedTimestamp(GraphSerializable, TableSerializable):
             attributes={}
         )
         yield relationship
+
+    def create_next_atlas_entity(self) -> Union[AtlasEntity, None]:
+        try:
+            print(self.__dict__)
+            StopIteration
+        except StopIteration:
+            return None
+
+    def create_next_atlas_relation(self) -> Union[AtlasRelationship, None]:
+        try:
+            print(self.__dict__)
+            StopIteration
+        except StopIteration:
+            return None
 
     def create_next_record(self) -> Union[RDSModel, None]:
         try:
