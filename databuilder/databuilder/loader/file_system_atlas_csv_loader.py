@@ -23,7 +23,7 @@ LOGGER = logging.getLogger(__name__)
 
 class FsAtlasCSVLoader(Loader):
     """
-    Write node and relationship CSV file(s) that can be consumed by
+    Write entity and relationship CSV file(s) that can be consumed by
     AtlasCsvPublisher.
     It assumes that the record it consumes is instance of AtlasCsvSerializable
     """
@@ -46,7 +46,7 @@ class FsAtlasCSVLoader(Loader):
 
     def init(self, conf: ConfigTree) -> None:
         """
-        Initializing FsAtlasCSVLoader by creating directory for node files
+        Initializing FsAtlasCSVLoader by creating directory for entity files
         and relationship files. Note that the directory defined in
         configuration should not exist.
         :param conf:
@@ -96,7 +96,7 @@ class FsAtlasCSVLoader(Loader):
         Writes AtlasSerializable into CSV files.
         There are multiple CSV files that this method writes.
         This is because there're not only node and relationship, but also it
-        can also have different nodes, and relationships.
+        can also have different entities, and relationships.
 
         Common pattern for both nodes and relations:
          1. retrieve csv row (a dict where keys represent a header,
@@ -111,7 +111,7 @@ class FsAtlasCSVLoader(Loader):
         entity = csv_serializable.next_atlas_entity()
         while entity:
             entity_dict = atlas_serializer.serialize_entity(entity)
-            key = (entity.typeName, self._make_key(entity_dict))
+            key = (self._make_key(entity_dict), entity.typeName)
             file_suffix = '{}_{}'.format(*key)
             entity_writer = self._get_writer(entity_dict,
                                              self._entity_file_mapping,
@@ -128,7 +128,7 @@ class FsAtlasCSVLoader(Loader):
                     relation.entityType2,
                     self._make_key(relation_dict))
 
-            file_suffix = f'{key2[0]}_{key2[1]}'
+            file_suffix = f'{key2[2]}_{key2[0]}_{key2[1]}'
             relation_writer = self._get_writer(relation_dict,
                                                self._relation_file_mapping,
                                                key2,
@@ -186,6 +186,6 @@ class FsAtlasCSVLoader(Loader):
     def get_scope(self) -> str:
         return "loader.filesystem_csv_atlas"
 
-    def _make_key(self, record_dict: Dict[str, Any]) -> int:
+    def _make_key(self, record_dict: Dict[str, Any]) -> str:
         """ Each unique set of record keys is assigned an increasing numeric key """
-        return self._keys.setdefault(frozenset(record_dict.keys()), len(self._keys))
+        return str(self._keys.setdefault(frozenset(record_dict.keys()), len(self._keys))).rjust(3, '0')
