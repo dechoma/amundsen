@@ -6,9 +6,10 @@ from collections import namedtuple
 AtlasRelationship = namedtuple(
     'AtlasRelationship',
     [
+        'relationshipType',
         'entityType1',
-        'entityType2',
         'entityQualifiedName1',
+        'entityType2',
         'entityQualifiedName2',
         'attributes'
     ]

@@ -21,9 +21,7 @@ from databuilder.models.graph_serializable import GraphSerializable
 from databuilder.models.table_metadata import TagMetadata
 from databuilder.models.atlas_entity import AtlasEntity
 from databuilder.models.atlas_relationship import AtlasRelationship
-from databuilder.models.atlas_serializable import (
-    NAME, URL, QUALIFIED_NAME, ID, DESCRIPTION, CREATED_TIMESTAMP, CLUSTER, PRODUCT, GROUP
-)
+from common.amundsen_common.utils.atlas_utils import AtlasCommonParams, AtlasDashboardTypes, AtlasSerializedEntityFields
 from databuilder.models.table_serializable import TableSerializable
 from databuilder.models.atlas_serializable import AtlasSerializable
 
@@ -108,7 +106,7 @@ class DashboardMetadata(GraphSerializable, TableSerializable, AtlasSerializable)
         self._relation_iterator = self._create_next_relation()
         self._record_iterator = self._create_record_iterator()
         self._atlas_entity_iterator = self._create_next_atlas_entity()
-        self._atlas_relation_iterator = self._create_next_atlas_relation()
+        # self._atlas_relation_iterator = self._create_next_atlas_relation()
 
     def __repr__(self) -> str:
         return f'DashboardMetadata(' \
@@ -152,11 +150,11 @@ class DashboardMetadata(GraphSerializable, TableSerializable, AtlasSerializable)
 
         # dashboard group
         group_attrs_mapping = [
-            (QUALIFIED_NAME, self._get_dashboard_group_key()),
-            (NAME, self.dashboard_group),
-            (ID, self.dashboard_group_id),
-            (DESCRIPTION, self.dashboard_group_description),
-            (URL, self.dashboard_group_url)
+            (AtlasCommonParams.qualified_name, self._get_dashboard_group_key()),
+            (AtlasCommonParams.name, self.dashboard_group),
+            (AtlasCommonParams.id, self.dashboard_group_id),
+            (AtlasCommonParams.description, self.dashboard_group_description),
+            (AtlasCommonParams.url, self.dashboard_group_url)
         ]
         dashboard_group_entity_attrs = dict()
         for attr in group_attrs_mapping:
@@ -165,6 +163,7 @@ class DashboardMetadata(GraphSerializable, TableSerializable, AtlasSerializable)
 
         dashboard_group_entity = AtlasEntity(
             typeName=self.DASHBOARD_GROUP_ATLAS_ENTITY_TYPE,
+            relationships=None,
             attributes=dashboard_group_entity_attrs
         )
 
@@ -172,13 +171,13 @@ class DashboardMetadata(GraphSerializable, TableSerializable, AtlasSerializable)
 
         # dashboard
         attrs_mapping = [
-            (QUALIFIED_NAME, self._get_dashboard_key()),
-            (NAME, self.dashboard_name),
-            (DESCRIPTION, self.dashboard_group_description),
-            (URL, self.dashboard_url),
-            (CLUSTER, self.cluster),
-            (PRODUCT, self.product),
-            (CREATED_TIMESTAMP, self.created_timestamp)
+            (AtlasCommonParams.qualified_name, self._get_dashboard_key()),
+            (AtlasCommonParams.name, self.dashboard_name),
+            (AtlasCommonParams.description, self.description),
+            (AtlasCommonParams.url, self.dashboard_url),
+            (AtlasCommonParams.cluster, self.cluster),
+            (AtlasCommonParams.product, self.product),
+            (AtlasCommonParams.created_timestamp, self.created_timestamp)
         ]
 
         dashboard_entity_attrs = dict()
@@ -186,28 +185,40 @@ class DashboardMetadata(GraphSerializable, TableSerializable, AtlasSerializable)
             attr_key, attr_value = attr
             dashboard_entity_attrs[attr_key] = attr_value
 
+        relationship_list = list()
+        """
+        relationship in form 'relation_attribute#relation_entity_type#qualified_name_of_related_object
+        """
+        relationship_list.append(AtlasSerializedEntityFields.relationships_kv_separator
+                                 .join((AtlasCommonParams.group,
+                                        AtlasDashboardTypes.group,
+                                        self._get_dashboard_group_key())))
+
         dashboard_entity = AtlasEntity(
             typeName=self.DASHBOARD_ATLAS_ENTITY_TYPE,
-            attributes=dashboard_entity_attrs
+            attributes=dashboard_entity_attrs,
+            relationships=AtlasSerializedEntityFields.relationships_separator.join(relationship_list)
         )
         yield dashboard_entity
 
     def create_next_atlas_relation(self) -> Union[AtlasRelationship, None]:
-        try:
-            return next(self._atlas_relation_iterator)
-        except StopIteration:
-            return None
+        pass
+        # try:
+        #     return next(self._atlas_relation_iterator)
+        # except StopIteration:
+        #     return None
 
-    def _create_next_atlas_relation(self) -> Iterator[AtlasRelationship]:
-        # Dashboard group <-> Dashboard
-        cluster_dashboard_group_relationship = AtlasRelationship(
-            entityType1=self.DASHBOARD_GROUP_ATLAS_ENTITY_TYPE,
-            entityQualifiedName1=self._get_dashboard_group_key(),
-            entityType2=self.DASHBOARD_ATLAS_ENTITY_TYPE,
-            entityQualifiedName2=self._get_dashboard_key(),
-            attributes={}
-        )
-        yield cluster_dashboard_group_relationship
+    # def _create_next_atlas_relation(self) -> Iterator[AtlasRelationship]:
+    #     # Dashboard group <-> Dashboard
+    #     cluster_dashboard_group_relationship = AtlasRelationship(
+    #         relationshipType=AtlasRelationshipTypes.group_dashboard,
+    #         entityType1=AtlasDashboardTypes.group,
+    #         entityQualifiedName1=self._get_dashboard_group_key(),
+    #         entityType2=AtlasDashboardTypes.metadata,
+    #         entityQualifiedName2=self._get_dashboard_key(),
+    #         attributes={}
+    #     )
+    #     yield cluster_dashboard_group_relationship
 
     def create_next_node(self) -> Union[GraphNode, None]:
         try:

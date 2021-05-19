@@ -7,21 +7,6 @@ from typing import Union  # noqa: F401
 from databuilder.models.atlas_entity import AtlasEntity
 from databuilder.models.atlas_relationship import AtlasRelationship
 
-GUID = 'guid'
-NAME = 'name'
-QUALIFIED_NAME = 'qualifiedName'
-URL = 'url'
-TYPE_NAME = 'typeName'
-ID = 'id'
-DESCRIPTION = 'description'
-CREATED_TIMESTAMP = 'createdTimestamp'
-LAST_MODIFIED_TIMESTAMP = 'lastModifiedTimestamp'
-CLUSTER = 'cluster'
-PRODUCT = 'product'
-TABLES = 'tables'
-GROUP = 'group'
-OWNED_BY = 'ownedBy'
-
 
 class AtlasSerializable(object, metaclass=abc.ABCMeta):
     """

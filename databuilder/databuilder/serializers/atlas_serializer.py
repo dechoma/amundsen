@@ -7,10 +7,7 @@ from typing import (
 
 from databuilder.models.atlas_entity import AtlasEntity
 from databuilder.models.atlas_relationship import AtlasRelationship
-from databuilder.models.atlas_serializable import (
-    GUID, TYPE_NAME,
-)
-from databuilder.publisher.neo4j_csv_publisher import UNQUOTED_SUFFIX
+from common.amundsen_common.utils.atlas_utils import AtlasSerializedRelationshipFields, AtlasSerializedEntityFields
 
 
 def serialize_entity(entity: Optional[AtlasEntity]) -> Dict[str, Any]:
@@ -18,10 +15,11 @@ def serialize_entity(entity: Optional[AtlasEntity]) -> Dict[str, Any]:
         return {}
 
     entity_dict = {
-        TYPE_NAME: entity.typeName
+        AtlasSerializedEntityFields.type_name: entity.typeName,
+        AtlasSerializedEntityFields.relationships: entity.relationships
     }
     for key, value in entity.attributes.items():
-        key_suffix = '-elo'
+        key_suffix = ''
         formatted_key = f'{key}{key_suffix}'
         entity_dict[formatted_key] = value
     return entity_dict
@@ -32,25 +30,15 @@ def serialize_relationship(relationship: Optional[AtlasRelationship]) -> Dict[st
         return {}
 
     relationship_dict = {
-        "entityType1": relationship.entityType1,
-        "entityQualifiedName1": relationship.entityQualifiedName1,
-        "entityType2": relationship.entityType2,
-        "entityQualifiedName2": relationship.entityQualifiedName2,
+        AtlasSerializedRelationshipFields.relation_type: relationship.relationshipType,
+        AtlasSerializedRelationshipFields.entity_type_1: relationship.entityType1,
+        AtlasSerializedRelationshipFields.qualified_name_1: relationship.entityQualifiedName1,
+        AtlasSerializedRelationshipFields.entity_type_2: relationship.entityType2,
+        AtlasSerializedRelationshipFields.qualified_name_2: relationship.entityQualifiedName2,
     }
     for key, value in relationship.attributes.items():
-        key_suffix = '-elo'
+        key_suffix = ''
         formatted_key = f'{key}{key_suffix}'
         relationship_dict[formatted_key] = value
 
     return relationship_dict
-
-
-
-def _get_neo4j_suffix_value(value: Any) -> str:
-    if isinstance(value, int):
-        return UNQUOTED_SUFFIX
-
-    if isinstance(value, bool):
-        return UNQUOTED_SUFFIX
-
-    return ''

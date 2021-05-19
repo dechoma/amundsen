@@ -73,7 +73,7 @@ class FsNeo4jCSVLoader(Loader):
         """
         if os.path.exists(path):
             if self._force_create_dir:
-                LOGGER.info('Directory exist. Deleting directory %s', path)
+                LOGGER.warning('Directory exist. Deleting directory %s', path)
                 shutil.rmtree(path)
             else:
                 raise RuntimeError(f'Directory should not exist: {path}')
