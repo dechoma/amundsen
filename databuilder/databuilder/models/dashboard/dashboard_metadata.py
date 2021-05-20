@@ -21,7 +21,7 @@ from databuilder.models.graph_serializable import GraphSerializable
 from databuilder.models.table_metadata import TagMetadata
 from databuilder.models.atlas_entity import AtlasEntity
 from databuilder.models.atlas_relationship import AtlasRelationship
-from common.amundsen_common.utils.atlas_utils import AtlasCommonParams, AtlasDashboardTypes, AtlasSerializedEntityFields
+from common.amundsen_common.utils.atlas_utils import AtlasCommonParams, AtlasDashboardTypes, AtlasSerializedEntityFields, AtlasEntityOperation
 from databuilder.models.table_serializable import TableSerializable
 from databuilder.models.atlas_serializable import AtlasSerializable
 
@@ -66,8 +66,8 @@ class DashboardMetadata(GraphSerializable, TableSerializable, AtlasSerializable)
     DASHBOARD_TAG_RELATION_TYPE = 'TAG'
     TAG_DASHBOARD_RELATION_TYPE = 'TAG_OF'
 
-    DASHBOARD_ATLAS_ENTITY_TYPE = 'Dashboard'
-    DASHBOARD_GROUP_ATLAS_ENTITY_TYPE = 'DashboardGroup'
+    ATLAS_DASHBOARD_KEY_FORMAT = '{product}_dashboard://{cluster}.{dashboard_group_id}/{dashboard_id}'
+    ATLAS_DASHBOARD_GROUP_KEY_FORMAT = '{product}_dashboard://{cluster}.{dashboard_group_id}'
 
     serialized_nodes: Set[Any] = set()
     serialized_rels: Set[Any] = set()
@@ -106,7 +106,6 @@ class DashboardMetadata(GraphSerializable, TableSerializable, AtlasSerializable)
         self._relation_iterator = self._create_next_relation()
         self._record_iterator = self._create_record_iterator()
         self._atlas_entity_iterator = self._create_next_atlas_entity()
-        # self._atlas_relation_iterator = self._create_next_atlas_relation()
 
     def __repr__(self) -> str:
         return f'DashboardMetadata(' \
@@ -162,7 +161,8 @@ class DashboardMetadata(GraphSerializable, TableSerializable, AtlasSerializable)
             dashboard_group_entity_attrs[attr_key] = attr_value
 
         dashboard_group_entity = AtlasEntity(
-            typeName=self.DASHBOARD_GROUP_ATLAS_ENTITY_TYPE,
+            typeName=AtlasDashboardTypes.group,
+            operation=AtlasEntityOperation.CREATE,
             relationships=None,
             attributes=dashboard_group_entity_attrs
         )
@@ -195,7 +195,8 @@ class DashboardMetadata(GraphSerializable, TableSerializable, AtlasSerializable)
                                         self._get_dashboard_group_key())))
 
         dashboard_entity = AtlasEntity(
-            typeName=self.DASHBOARD_ATLAS_ENTITY_TYPE,
+            typeName=AtlasDashboardTypes.metadata,
+            operation=AtlasEntityOperation.CREATE,
             attributes=dashboard_entity_attrs,
             relationships=AtlasSerializedEntityFields.relationships_separator.join(relationship_list)
         )
@@ -203,22 +204,6 @@ class DashboardMetadata(GraphSerializable, TableSerializable, AtlasSerializable)
 
     def create_next_atlas_relation(self) -> Union[AtlasRelationship, None]:
         pass
-        # try:
-        #     return next(self._atlas_relation_iterator)
-        # except StopIteration:
-        #     return None
-
-    # def _create_next_atlas_relation(self) -> Iterator[AtlasRelationship]:
-    #     # Dashboard group <-> Dashboard
-    #     cluster_dashboard_group_relationship = AtlasRelationship(
-    #         relationshipType=AtlasRelationshipTypes.group_dashboard,
-    #         entityType1=AtlasDashboardTypes.group,
-    #         entityQualifiedName1=self._get_dashboard_group_key(),
-    #         entityType2=AtlasDashboardTypes.metadata,
-    #         entityQualifiedName2=self._get_dashboard_key(),
-    #         attributes={}
-    #     )
-    #     yield cluster_dashboard_group_relationship
 
     def create_next_node(self) -> Union[GraphNode, None]:
         try:

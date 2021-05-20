@@ -7,6 +7,7 @@ from common.amundsen_common.utils.atlas_utils import AtlasSerializedEntityFields
 AtlasEntity = namedtuple(
     'AtlasEntity',
     [
+        'operation',
         'typeName',
         'relationships',
         'attributes'

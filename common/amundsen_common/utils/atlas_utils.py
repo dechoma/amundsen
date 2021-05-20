@@ -10,6 +10,11 @@ class AtlasStatus:
     DELETED = "DELETED"
 
 
+class AtlasEntityOperation:
+    CREATE = 'CREATE'
+    UPDATE = 'UPDATE'
+
+
 class AtlasCommonParams:
     qualified_name = 'qualifiedName'
     guid = 'guid'
@@ -27,6 +32,7 @@ class AtlasCommonParams:
     cluster = 'cluster'
     product = 'product'
     created_timestamp = 'createdTimestamp'
+    last_modified_timestamp = 'lastModifiedTimestamp'
     query_text = 'queryText'
     type = 'type'
 
@@ -55,6 +61,7 @@ class AtlasRelationshipTypes:
     dashboard_query = 'Dashboard__DashboardQuery'
     query_chart = 'DashboardQuery__DashboardChart'
     dashboard_execution = 'Dashboard__DashboardExecution'
+    table_dashboard = 'Table__Dashboard'
 
 
 class AtlasRelationshipAttrs:
@@ -62,6 +69,7 @@ class AtlasRelationshipAttrs:
     queries = 'queries'
     query = 'query'
     charts = 'charts'
+
 
 class AtlasSerializedRelationshipFields:
     relation_type = 'relationshipType'
@@ -72,6 +80,7 @@ class AtlasSerializedRelationshipFields:
 
 
 class AtlasSerializedEntityFields:
+    operation = 'operation'
     relationships = 'relationships'
     type_name = 'typeName'
     attributes = 'attributes'

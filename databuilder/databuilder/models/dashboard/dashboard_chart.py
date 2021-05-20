@@ -10,7 +10,7 @@ from amundsen_rds.models import RDSModel
 from amundsen_rds.models.dashboard import DashboardChart as RDSDashboardChart
 from databuilder.models.atlas_entity import AtlasEntity
 
-from amundsen_common.utils.atlas_utils import AtlasCommonParams, AtlasSerializedEntityFields, AtlasRelationshipAttrs, AtlasDashboardTypes
+from amundsen_common.utils.atlas_utils import AtlasCommonParams, AtlasSerializedEntityFields, AtlasRelationshipAttrs, AtlasDashboardTypes, AtlasEntityOperation
 from databuilder.models.atlas_relationship import AtlasRelationship
 
 
@@ -192,10 +192,11 @@ class DashboardChart(GraphSerializable, TableSerializable, AtlasSerializable):
 
         chart_entity = AtlasEntity(
             typeName=AtlasDashboardTypes.chart,
+            operation=AtlasEntityOperation.CREATE,
             attributes=chart_entity_attrs,
             relationships=AtlasSerializedEntityFields.relationships_separator.join(relationship_list)
         )
-        #print(chart_entity)
+
         yield chart_entity
 
     def __repr__(self) -> str:

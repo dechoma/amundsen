@@ -16,12 +16,11 @@ def serialize_entity(entity: Optional[AtlasEntity]) -> Dict[str, Any]:
 
     entity_dict = {
         AtlasSerializedEntityFields.type_name: entity.typeName,
+        AtlasSerializedEntityFields.operation: entity.operation,
         AtlasSerializedEntityFields.relationships: entity.relationships
     }
     for key, value in entity.attributes.items():
-        key_suffix = ''
-        formatted_key = f'{key}{key_suffix}'
-        entity_dict[formatted_key] = value
+        entity_dict[key] = value
     return entity_dict
 
 
@@ -37,8 +36,6 @@ def serialize_relationship(relationship: Optional[AtlasRelationship]) -> Dict[st
         AtlasSerializedRelationshipFields.qualified_name_2: relationship.entityQualifiedName2,
     }
     for key, value in relationship.attributes.items():
-        key_suffix = ''
-        formatted_key = f'{key}{key_suffix}'
-        relationship_dict[formatted_key] = value
+        relationship_dict[key] = value
 
     return relationship_dict

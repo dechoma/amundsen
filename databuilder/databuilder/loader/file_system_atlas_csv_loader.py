@@ -52,7 +52,6 @@ class FsAtlasCSVLoader(Loader):
         :param conf:
         :return:
         """
-        LOGGER.warning("*********************")
         conf = conf.with_fallback(FsAtlasCSVLoader._DEFAULT_CONFIG)
 
         self._entity_dir = conf.get_string(FsAtlasCSVLoader.ENTITY_DIR_PATH)
