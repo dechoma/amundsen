@@ -98,7 +98,7 @@ class FsAtlasCSVLoader(Loader):
         This is because there're not only node and relationship, but also it
         can also have different entities, and relationships.
 
-        Common pattern for both nodes and relations:
+        Common pattern for both entities and relations:
          1. retrieve csv row (a dict where keys represent a header,
          values represent a row)
          2. using this dict to get a appropriate csv writer and write to it.
@@ -124,11 +124,11 @@ class FsAtlasCSVLoader(Loader):
         relation = csv_serializable.next_atlas_relation()
         while relation:
             relation_dict = atlas_serializer.serialize_relationship(relation)
-            key2 = (relation.entityType1,
-                    relation.entityType2,
-                    self._make_key(relation_dict))
+            key2 = (self._make_key(relation_dict),
+                    relation.entityType1,
+                    relation.entityType2)
 
-            file_suffix = f'{key2[2]}_{key2[0]}_{key2[1]}'
+            file_suffix = f'{key2[0]}_{key2[1]}_{key2[2]}'
             relation_writer = self._get_writer(relation_dict,
                                                self._relation_file_mapping,
                                                key2,
